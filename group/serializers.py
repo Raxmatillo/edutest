@@ -19,3 +19,9 @@ class GroupJoinRequestSerializer(serializers.ModelSerializer):
 
     def get_student_name(self, obj):
         return obj.student.full_name
+
+
+class InviteStudentsSerializer(serializers.Serializer):
+    usernames = serializers.ListField(
+        child=serializers.CharField(), write_only=True
+    )

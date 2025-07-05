@@ -2,14 +2,30 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import RegisterSerializer, UserSerializer, LogoutSerializer
+from .serializers import RegisterSerializer, UserSerializer, LogoutSerializer, UserListSerializer
 from drf_yasg.utils import swagger_auto_schema
 
 User = get_user_model()
 
+
+
+class TeacherListView(generics.ListAPIView):
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(role='teacher')
+
+
+class StudentListView(generics.ListAPIView):
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(role='student')
 
 class RegisterView(APIView):
     """
