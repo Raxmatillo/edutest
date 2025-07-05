@@ -43,3 +43,19 @@ class Question(models.Model):
 
     def __str__(self):
         return f"Question {self.id} for Test {self.test.title}"
+
+
+class TestResult(models.Model):
+    id = models.AutoField(primary_key=True, help_text="Unique identifier for the question")
+    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name='results')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='test_results')
+    score = models.DecimalField(max_digits=5, decimal_places=2)
+    total_questions = models.IntegerField()
+    correct_answers = models.IntegerField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('test', 'student')
+
+    def __str__(self):
+        return f"{self.student.username} - {self.test.title} -> {self.score}"

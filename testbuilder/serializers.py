@@ -1,5 +1,7 @@
+import random
+
 from rest_framework import serializers
-from .models import Question, Test
+from .models import Question, Test, TestResult
 
 class TestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,6 +29,7 @@ class TestSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+
 class QuestionSerializer(serializers.ModelSerializer):
     correct = serializers.ChoiceField(choices=[('a', 'A'), ('b', 'B'), ('c', 'C'), ('d', 'D')])
 
@@ -47,6 +50,44 @@ class QuestionSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+
+
+
+class ShuffledQuestionSerializer(serializers.ModelSerializer):
+    answers = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Question
+        fields = [
+            'id',
+            'question_title',
+            'image',
+            'answers',
+        ]
+
+    def get_answers(self, obj):
+        # Original variants
+        options = [
+            {'label': 'A', 'value': obj.answer_a, 'key': 'a'},
+            {'label': 'B', 'value': obj.answer_b, 'key': 'b'},
+            {'label': 'C', 'value': obj.answer_c, 'key': 'c'},
+            {'label': 'D', 'value': obj.answer_d, 'key': 'd'},
+        ]
+
+        # Faqat mavjud variantlar bo‘yicha filter (ixtiyoriy)
+        options = [opt for opt in options if opt['value']]
+
+        random.shuffle(options)
+        return options
+
+class TestResultSerializer(serializers.ModelSerializer):
+    test_title = serializers.CharField(source='test.title', read_only=True)
+
+    class Meta:
+        model = TestResult
+        fields = ['id', 'test', 'test_title', 'score', 'correct_answers', 'total_questions', 'submitted_at']
+
+
 class BulkQuestionCreateSerializer(serializers.Serializer):
     questions = QuestionSerializer(many=True)
 
@@ -55,3 +96,9 @@ class BulkQuestionCreateSerializer(serializers.Serializer):
         return Question.objects.bulk_create([
             Question(**item) for item in questions_data
         ])
+
+
+class SubmitAnswerSerializer(serializers.Serializer):
+    answers = serializers.DictField(
+        child=serializers.ChoiceField(choices=[('a', 'A'), ('b', 'B'), ('c', 'C'), ('d', 'D')])
+    )
