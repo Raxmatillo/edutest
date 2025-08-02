@@ -8,7 +8,8 @@ from .views import (
     TestQuestionListView,
     SubmitTestView,
     MyResultsView,
-    TestResultsView
+    TestResultsView,
+    TeacherQuestionListView
 )
 
 urlpatterns = [
@@ -16,6 +17,7 @@ urlpatterns = [
     path('tests/', TestListView.as_view(), name='test-list'),
     path('tests/<int:pk>/', TestDetailView.as_view(), name='test-detail'),
     path('questions/create/', QuestionCreateView.as_view(), name='question-create'),
+    path('tests/<int:test_id>/questions_list/', TeacherQuestionListView.as_view()),
     path('questions/bulk-create/', BulkQuestionCreateAPIView.as_view(), name='bulk-question-create'),
     path('tests/<int:test_id>/questions/', TestQuestionListView.as_view(), name='test-questions'),
     path('tests/<int:test_id>/submit/', SubmitTestView.as_view(), name='submit-test'),

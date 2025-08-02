@@ -5,6 +5,7 @@ User = settings.AUTH_USER_MODEL
 
 class Group(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_groups')
     students = models.ManyToManyField(User, related_name='joined_groups', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

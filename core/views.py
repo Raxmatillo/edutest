@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -5,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import RegisterSerializer, UserSerializer, LogoutSerializer, UserListSerializer
+from .serializers import RegisterSerializer, UserSerializer, LogoutSerializer, UserListSerializer, UserShortSerializer
 from drf_yasg.utils import swagger_auto_schema
 
 User = get_user_model()
@@ -81,3 +82,20 @@ class LogoutView(APIView):
             return Response({"detail": "Successfully logged out."}, status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class UserSearchAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        query = request.query_params.get('q', '')
+        if not query:
+            return Response([])
+
+        users = User.objects.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query)
+        )[:10]
+        serializer = UserShortSerializer(users, many=True)
+        return Response(serializer.data)

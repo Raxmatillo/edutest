@@ -49,6 +49,16 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'username', 'role']
 
+class UserShortSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'full_name', 'role']
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}".strip()
+
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
 

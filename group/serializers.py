@@ -5,7 +5,7 @@ from core.models import User  # user modelini import qilish
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ['id', 'name', 'teacher', 'students', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'teacher', 'students', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at', 'teacher']
 
 
